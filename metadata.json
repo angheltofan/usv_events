@@ -1,0 +1,5 @@
+{
+  "name": "USV Events Manager",
+  "description": "A centralized platform for managing university events, allowing students to discover and register for events, and organizers to manage them.",
+  "requestFramePermissions": []
+}
