@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { notificationService } from '../../services/notificationService';
 import { Notification, NotificationType } from '../../types';
@@ -70,7 +71,7 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({ isOp
     if (diffInSeconds < 60) return 'Acum câteva secunde';
     if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)} min în urmă`;
     if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)} ore în urmă`;
-    return date.toLocaleDateString('en-GB');
+    return date.toLocaleDateString('ro-RO');
   };
 
   if (!isOpen) return null;
@@ -78,7 +79,7 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({ isOp
   return (
     <>
       <div className="fixed inset-0 z-40" onClick={onClose}></div>
-      <div className="absolute right-0 top-14 mt-2 w-80 md:w-96 bg-white rounded-xl shadow-2xl border border-gray-100 overflow-hidden z-50 animate-fade-in origin-top-right">
+      <div className="absolute right-0 top-14 mt-2 w-80 md:w-96 max-w-[90vw] bg-white rounded-xl shadow-2xl border border-gray-100 overflow-hidden z-50 animate-fade-in origin-top-right mr-2 md:mr-0">
         <div className="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
           <h3 className="font-bold text-gray-900">Notificări</h3>
           {notifications.some(n => !n.isRead) && (
@@ -107,11 +108,11 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({ isOp
                  className={`p-4 border-b border-gray-50 cursor-pointer transition-colors hover:bg-gray-50 flex gap-3 ${!n.isRead ? 'bg-indigo-50/50' : 'bg-white'}`}
                >
                   <div className="mt-1 shrink-0">{getIcon(n.type)}</div>
-                  <div className="flex-1">
-                    <p className={`text-sm ${!n.isRead ? 'font-bold text-gray-900' : 'font-medium text-gray-700'}`}>
+                  <div className="flex-1 min-w-0">
+                    <p className={`text-sm ${!n.isRead ? 'font-bold text-gray-900' : 'font-medium text-gray-700'} break-words`}>
                       {n.title}
                     </p>
-                    <p className="text-xs text-gray-500 mt-1 leading-snug">{n.message}</p>
+                    <p className="text-xs text-gray-500 mt-1 leading-snug break-words">{n.message}</p>
                     <p className="text-[10px] text-gray-400 mt-2">{formatTime(n.createdAt)}</p>
                   </div>
                   {!n.isRead && (

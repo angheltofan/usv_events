@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { LoginForm } from './components/auth/LoginForm';
@@ -108,7 +109,7 @@ const DashboardLayout: React.FC<{ children: React.ReactNode, currentView: ViewSt
                 onClick={logout}
                 className="text-sm font-medium text-gray-600 hover:text-red-600 transition-colors ml-2 px-3 py-1.5 rounded-md hover:bg-red-50"
               >
-                Sign out
+                Deconectare
               </button>
             </div>
           </div>

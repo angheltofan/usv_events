@@ -1,3 +1,4 @@
+
 import { API_BASE_URL, LOCAL_STORAGE_KEYS } from '../constants';
 import { ApiResponse, Event, EventStatus, CreateEventPayload, Participant, EventStats } from '../types';
 
@@ -40,11 +41,11 @@ export const eventService = {
       
       const data = await response.json();
       if (!response.ok) {
-        return { success: false, message: data.message || 'Failed to fetch events' };
+        return { success: false, message: data.message || 'Nu s-au putut prelua evenimentele.' };
       }
       return { success: true, data: Array.isArray(data) ? data : data.data || [] };
     } catch (e) {
-      return { success: false, message: 'Network error occurred.' };
+      return { success: false, message: 'Eroare de rețea.' };
     }
   },
 
@@ -56,10 +57,10 @@ export const eventService = {
         headers: getNoCacheHeaders(),
       });
       const data = await response.json();
-      if (!response.ok) return { success: false, message: data.message };
+      if (!response.ok) return { success: false, message: data.message || 'Eroare la preluarea evenimentelor tale.' };
       return { success: true, data: data.data || [] };
     } catch (e) {
-      return { success: false, message: 'Network error.' };
+      return { success: false, message: 'Eroare de rețea.' };
     }
   },
 
@@ -73,12 +74,13 @@ export const eventService = {
       });
       const data = await response.json();
       if (!response.ok) {
-          // Return detailed errors if available
-          return { success: false, message: data.message, errors: data.errors };
+          // Improve error parsing
+          const msg = data.message || (data.error ? data.error : 'Eroare la crearea evenimentului.');
+          return { success: false, message: msg, errors: data.errors };
       }
       return { success: true, data: data.data };
     } catch (e) {
-      return { success: false, message: 'Network error.' };
+      return { success: false, message: 'Eroare de rețea.' };
     }
   },
 
@@ -92,11 +94,11 @@ export const eventService = {
       });
       const data = await response.json();
       if (!response.ok) {
-           return { success: false, message: data.message, errors: data.errors };
+           return { success: false, message: data.message || 'Eroare la actualizare.', errors: data.errors };
       }
       return { success: true, data: data.data };
     } catch (e) {
-      return { success: false, message: 'Network error.' };
+      return { success: false, message: 'Eroare de rețea.' };
     }
   },
 
@@ -107,13 +109,24 @@ export const eventService = {
         method: 'DELETE',
         headers: getHeaders(false),
       });
+      
       if (!response.ok) {
-          const data = await response.json();
-          return { success: false, message: data.message };
+          const resClone = response.clone();
+          try {
+            const data = await response.json();
+            return { success: false, message: data.message || 'Ștergerea a eșuat.' };
+          } catch {
+             const text = await resClone.text();
+             // Translate raw DB errors to user friendly message
+             if (text && (text.toLowerCase().includes('failed query') || text.toLowerCase().includes('constraint') || text.includes('delete from "events"'))) {
+                 return { success: false, message: 'Nu se poate șterge evenimentul deoarece există participanți, feedback sau alte date asociate.' };
+             }
+             return { success: false, message: 'Eroare server la ștergere: ' + (text || response.statusText) };
+          }
       }
       return { success: true };
     } catch (e) {
-      return { success: false, message: 'Network error.' };
+      return { success: false, message: 'Eroare de conexiune.' };
     }
   },
 
@@ -127,11 +140,11 @@ export const eventService = {
       
       if (!response.ok) {
           const data = await response.json();
-          return { success: false, message: data.message || 'Submission failed' };
+          return { success: false, message: data.message || 'Trimiterea spre aprobare a eșuat.' };
       }
       return { success: true };
     } catch (e) {
-      return { success: false, message: 'Network error.' };
+      return { success: false, message: 'Eroare de rețea.' };
     }
   },
 
@@ -143,10 +156,10 @@ export const eventService = {
             headers: getNoCacheHeaders(),
         });
         const data = await response.json();
-        if(!response.ok) return { success: false, message: data.message };
+        if(!response.ok) return { success: false, message: data.message || 'Eroare la preluarea participanților.' };
         return { success: true, data: data.data || [] };
     } catch(e) {
-        return { success: false, message: 'Network error.' };
+        return { success: false, message: 'Eroare de rețea.' };
     }
   },
 
@@ -159,10 +172,10 @@ export const eventService = {
             body: JSON.stringify({ ticketNumber })
         });
         const data = await response.json();
-        if(!response.ok) return { success: false, message: data.message };
+        if(!response.ok) return { success: false, message: data.message || 'Check-in eșuat.' };
         return { success: true };
       } catch(e) {
-          return { success: false, message: 'Network error.' };
+          return { success: false, message: 'Eroare de rețea.' };
       }
   },
 
@@ -180,9 +193,9 @@ export const eventService = {
       }
 
       const data = await response.json();
-      return { success: false, message: data.message || 'Failed to review event' };
+      return { success: false, message: data.message || 'Eroare la validarea evenimentului.' };
     } catch (e) {
-      return { success: false, message: 'Network error occurred.' };
+      return { success: false, message: 'Eroare de rețea.' };
     }
   },
 
@@ -193,10 +206,10 @@ export const eventService = {
             headers: getNoCacheHeaders()
         });
         const data = await response.json();
-        if(!response.ok) return { success: false, message: data.message };
+        if(!response.ok) return { success: false, message: data.message || 'Eroare la preluarea înscrierilor.' };
         return { success: true, data: data.data || [] };
     } catch(e) {
-        return { success: false, message: 'Network error.' };
+        return { success: false, message: 'Eroare de rețea.' };
     }
   },
 
@@ -207,10 +220,10 @@ export const eventService = {
             headers: getNoCacheHeaders()
         });
         const data = await response.json();
-        if(!response.ok) return { success: false, message: data.message };
+        if(!response.ok) return { success: false, message: data.message || 'Eroare la preluarea favoritelor.' };
         return { success: true, data: data.data || [] };
     } catch(e) {
-        return { success: false, message: 'Network error.' };
+        return { success: false, message: 'Eroare de rețea.' };
     }
   },
 
@@ -232,41 +245,51 @@ export const eventService = {
   // Student: Register
   registerEvent: async (id: string): Promise<ApiResponse<void>> => {
       try {
+          // Send explicit notes field as per API spec. 
+          // This creates a NEW registration.
           const response = await fetch(`${API_BASE_URL}/events/${id}/register`, {
               method: 'POST',
               headers: getHeaders(true),
-              body: JSON.stringify({})
+              body: JSON.stringify({ notes: "Web Registration" }) 
           });
-          const data = await response.json();
-          if(!response.ok) return { success: false, message: data.message };
+          
+          if(!response.ok) {
+              const data = await response.json();
+              // 400 likely means user is already actively registered or event is closed
+              return { success: false, message: data.message || 'Înscrierea a eșuat. Verifică dacă ești deja înscris.' };
+          }
           return { success: true };
       } catch(e) {
-          return { success: false, message: 'Network error.' };
+          return { success: false, message: 'Eroare de rețea.' };
       }
   },
 
   // Student: Cancel Registration
   cancelRegistration: async (id: string): Promise<ApiResponse<void>> => {
       try {
-          // FIX: Include empty JSON body and Content-Type header
-          // Some backends require a valid JSON body even for DELETE requests
+          // FIXED: Removed body from DELETE request. 
+          // Use getHeaders(false) to avoid setting Content-Type.
+          // This should correctly delete the registration on the server.
           const response = await fetch(`${API_BASE_URL}/events/${id}/register`, {
               method: 'DELETE',
-              headers: getHeaders(true), 
-              body: JSON.stringify({})
+              headers: getHeaders(false) 
           });
           
           if(!response.ok) {
              try {
                  const data = await response.json();
-                 return { success: false, message: data.message || 'Failed to cancel registration' };
+                 // If already cancelled/not registered (404 or specific message), treat as success for UI
+                 if (response.status === 404 || (data.message && data.message.toLowerCase().includes('not registered'))) {
+                     return { success: true }; 
+                 }
+                 return { success: false, message: data.message || 'Anularea a eșuat.' };
              } catch(e) {
-                 return { success: false, message: `Failed to cancel registration (${response.status})` };
+                 return { success: false, message: `Anularea a eșuat (${response.status})` };
              }
           }
           return { success: true };
       } catch(e) {
-          return { success: false, message: 'Network error.' };
+          return { success: false, message: 'Eroare de rețea.' };
       }
   }
 };

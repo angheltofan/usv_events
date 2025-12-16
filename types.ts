@@ -146,6 +146,7 @@ export interface CreateDepartmentPayload {
 export interface Event {
   id: string;
   title: string;
+  slug?: string;
   description: string;
   shortDescription?: string;
   organizerId: string;
@@ -162,6 +163,12 @@ export interface Event {
   onlineLink?: string;
   registrationDeadline?: string;
   address?: string;
+  departmentId?: string;
+  requirements?: string;
+  targetAudience?: string;
+  isFeatured?: boolean;
+  tags?: string[];
+  facultyId?: string;
 }
 
 export interface CreateEventPayload {
@@ -185,6 +192,7 @@ export interface CreateEventPayload {
   targetAudience?: string;
   status?: string;
   rejectionReason?: string | null;
+  isFeatured?: boolean;
 }
 
 export interface Participant {

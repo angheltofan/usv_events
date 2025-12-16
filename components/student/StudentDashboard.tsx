@@ -75,7 +75,9 @@ export const StudentDashboard: React.FC = () => {
         else if (activeTab === 'registered') {
             const res = await eventService.getMyRegistrations();
             if (res.success && res.data) {
-                data = res.data.map((item: any) => item.event || item).filter((e: any) => !!e.id) as Event[]; 
+                // Filter out cancelled events from the view
+                const activeRegs = res.data.filter((item: any) => item.status !== 'cancelled');
+                data = activeRegs.map((item: any) => item.event || item).filter((e: any) => !!e.id) as Event[]; 
             }
         } 
         else if (activeTab === 'favorites') {
@@ -94,7 +96,8 @@ export const StudentDashboard: React.FC = () => {
         ]);
 
         if (regRes.success && regRes.data) {
-             const ids = regRes.data.map((r: any) => (r.event?.id || r.eventId || r.id));
+             const activeRegistrations = regRes.data.filter((r: any) => r.status !== 'cancelled');
+             const ids = activeRegistrations.map((r: any) => (r.event?.id || r.eventId || r.id));
              setRegisteredIds(new Set(ids));
         }
         if (favRes.success && favRes.data) {
@@ -216,7 +219,7 @@ export const StudentDashboard: React.FC = () => {
   const formatDate = (dateString: string) => {
     if(!dateString) return '';
     try {
-        return new Date(dateString).toLocaleDateString('en-GB', { 
+        return new Date(dateString).toLocaleDateString('ro-RO', { 
             day: '2-digit', 
             month: '2-digit', 
             year: 'numeric', 
@@ -256,12 +259,12 @@ export const StudentDashboard: React.FC = () => {
 
   return (
     <div className="space-y-6 animate-fade-in-up">
-       <div className="bg-indigo-600 rounded-3xl p-8 text-white shadow-xl relative overflow-hidden">
+       <div className="bg-indigo-600 rounded-3xl p-6 md:p-8 text-white shadow-xl relative overflow-hidden">
            <div className="absolute top-0 right-0 -mt-10 -mr-10 w-40 h-40 bg-white opacity-10 rounded-full blur-3xl"></div>
            <div className="absolute bottom-0 left-0 -mb-10 -ml-10 w-40 h-40 bg-purple-500 opacity-20 rounded-full blur-3xl"></div>
            
-           <h1 className="text-3xl font-bold mb-2 relative z-10">Descoperă Evenimente</h1>
-           <p className="text-indigo-100 relative z-10 max-w-xl">
+           <h1 className="text-2xl md:text-3xl font-bold mb-2 relative z-10">Descoperă Evenimente</h1>
+           <p className="text-indigo-100 relative z-10 max-w-xl text-sm md:text-base">
                Explorează activitățile din campus, workshop-uri, petreceri și oportunități de carieră.
            </p>
        </div>
@@ -273,25 +276,28 @@ export const StudentDashboard: React.FC = () => {
            </div>
        )}
 
-       <div className="flex space-x-1 bg-white p-1 rounded-xl shadow-sm border border-gray-100 w-fit">
-          <button 
-            onClick={() => setActiveTab('all')}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${activeTab === 'all' ? 'bg-indigo-100 text-indigo-700' : 'text-gray-600 hover:bg-gray-50'}`}
-          >
-              Toate Evenimentele
-          </button>
-          <button 
-            onClick={() => setActiveTab('registered')}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${activeTab === 'registered' ? 'bg-indigo-100 text-indigo-700' : 'text-gray-600 hover:bg-gray-50'}`}
-          >
-              Înscrierile Mele
-          </button>
-          <button 
-            onClick={() => setActiveTab('favorites')}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${activeTab === 'favorites' ? 'bg-indigo-100 text-indigo-700' : 'text-gray-600 hover:bg-gray-50'}`}
-          >
-              Favorite
-          </button>
+       {/* Responsive Tabs Container */}
+       <div className="w-full overflow-x-auto pb-2">
+           <div className="flex space-x-1 bg-white p-1 rounded-xl shadow-sm border border-gray-100 min-w-max">
+              <button 
+                onClick={() => setActiveTab('all')}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all whitespace-nowrap ${activeTab === 'all' ? 'bg-indigo-100 text-indigo-700' : 'text-gray-600 hover:bg-gray-50'}`}
+              >
+                  Toate Evenimentele
+              </button>
+              <button 
+                onClick={() => setActiveTab('registered')}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all whitespace-nowrap ${activeTab === 'registered' ? 'bg-indigo-100 text-indigo-700' : 'text-gray-600 hover:bg-gray-50'}`}
+              >
+                  Înscrierile Mele
+              </button>
+              <button 
+                onClick={() => setActiveTab('favorites')}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all whitespace-nowrap ${activeTab === 'favorites' ? 'bg-indigo-100 text-indigo-700' : 'text-gray-600 hover:bg-gray-50'}`}
+              >
+                  Favorite
+              </button>
+           </div>
        </div>
 
        {isLoading ? (
@@ -327,7 +333,7 @@ export const StudentDashboard: React.FC = () => {
                         onClick={() => openDetails(event)}
                         className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-all duration-300 flex flex-col h-full relative group cursor-pointer"
                    >
-                       <div className="h-40 bg-gray-100 relative overflow-hidden">
+                       <div className="h-40 bg-gray-100 relative overflow-hidden shrink-0">
                            {event.coverImage ? (
                                <img src={event.coverImage} alt={event.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                            ) : (
@@ -351,11 +357,16 @@ export const StudentDashboard: React.FC = () => {
                        </div>
                        
                        <div className="p-5 flex-1 flex flex-col">
-                           <div className="text-xs font-semibold text-indigo-600 mb-2 flex items-center justify-between">
-                               <div className="flex items-center">
+                           <div className="flex justify-between items-start mb-2">
+                                <div className="text-xs font-semibold text-indigo-600 flex items-center">
                                    <svg className="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
                                    {formatDate(event.startDate)}
                                </div>
+                               {event.targetAudience && (
+                                   <span className="text-[10px] bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded border border-indigo-100 max-w-[40%] truncate">
+                                       {event.targetAudience}
+                                   </span>
+                               )}
                            </div>
                            
                            <h3 className="text-lg font-bold text-gray-900 mb-2 line-clamp-2 leading-tight">
@@ -380,8 +391,8 @@ export const StudentDashboard: React.FC = () => {
                                </div>
                            </div>
                            
-                           <div className="pt-4 border-t border-gray-100 flex justify-between items-center mt-auto gap-3">
-                               <div className="flex items-center text-gray-500 text-sm overflow-hidden">
+                           <div className="pt-4 border-t border-gray-100 flex flex-wrap justify-between items-center mt-auto gap-3">
+                               <div className="flex items-center text-gray-500 text-sm overflow-hidden flex-1 min-w-0">
                                    <svg className="w-4 h-4 mr-1 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
                                    <span className="truncate">{event.location}</span>
                                </div>

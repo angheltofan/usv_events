@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { Event, Feedback, FeedbackStats, EventMaterial } from '../../types';
@@ -97,7 +98,7 @@ export const EventDetailsModal: React.FC<EventDetailsModalProps> = ({ isOpen, on
 
   const formatDate = (dateString: string) => {
     if (!dateString) return 'Data nespecificată';
-    return new Date(dateString).toLocaleDateString('en-GB', {
+    return new Date(dateString).toLocaleDateString('ro-RO', {
       day: '2-digit', 
       month: '2-digit', 
       year: 'numeric', 
@@ -164,6 +165,24 @@ export const EventDetailsModal: React.FC<EventDetailsModalProps> = ({ isOpen, on
                                 {event.address && <div className="text-gray-500 text-xs mt-1">{event.address}</div>}
                             </div>
                         </div>
+
+                        {/* Additional Info Cards if data exists */}
+                        {(event.requirements || event.targetAudience) && (
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                                {event.targetAudience && (
+                                    <div className="bg-indigo-50 p-3 rounded-xl border border-indigo-100 text-sm">
+                                        <div className="text-indigo-800 text-xs uppercase font-bold mb-1">Public Țintă</div>
+                                        <div className="text-indigo-900 font-medium">{event.targetAudience}</div>
+                                    </div>
+                                )}
+                                {event.requirements && (
+                                    <div className="bg-orange-50 p-3 rounded-xl border border-orange-100 text-sm">
+                                        <div className="text-orange-800 text-xs uppercase font-bold mb-1">Cerințe</div>
+                                        <div className="text-orange-900 font-medium">{event.requirements}</div>
+                                    </div>
+                                )}
+                            </div>
+                        )}
 
                         {/* Capacity & Deadline Section */}
                         <div className="mb-6 p-4 border border-indigo-100 rounded-xl bg-indigo-50/30">
@@ -276,7 +295,7 @@ export const EventDetailsModal: React.FC<EventDetailsModalProps> = ({ isOpen, on
                                      <StarRatingDisplay rating={rev.rating} />
                                  </div>
                                  <p className="text-sm text-gray-600 leading-snug">{rev.comment}</p>
-                                 <div className="text-[10px] text-gray-400 mt-1">{new Date(rev.createdAt).toLocaleDateString('en-GB')}</div>
+                                 <div className="text-[10px] text-gray-400 mt-1">{new Date(rev.createdAt).toLocaleDateString('ro-RO')}</div>
                              </div>
                          ))
                         }

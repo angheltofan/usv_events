@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { userService } from '../../services/userService';
 import { eventService } from '../../services/eventService';
@@ -264,11 +265,13 @@ export const AdminDashboard: React.FC = () => {
           <p className="text-red-700/80 font-medium">Panoul de control principal al universității.</p>
       </div>
 
-      {/* TABS */}
-      <div className="flex space-x-1 bg-white p-1.5 rounded-2xl shadow-sm border border-gray-100 w-fit">
-          <button onClick={() => setActiveTab('events')} className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-200 ${activeTab === 'events' ? 'bg-red-50 text-red-700 shadow-sm' : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'}`}>Evenimente</button>
-          <button onClick={() => setActiveTab('users')} className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-200 ${activeTab === 'users' ? 'bg-red-50 text-red-700 shadow-sm' : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'}`}>Utilizatori</button>
-          <button onClick={() => setActiveTab('structure')} className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-200 ${activeTab === 'structure' ? 'bg-red-50 text-red-700 shadow-sm' : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'}`}>Structură</button>
+      {/* TABS - Responsive Scroll */}
+      <div className="w-full overflow-x-auto pb-2">
+          <div className="flex space-x-1 bg-white p-1.5 rounded-2xl shadow-sm border border-gray-100 w-fit min-w-max">
+              <button onClick={() => setActiveTab('events')} className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-200 whitespace-nowrap ${activeTab === 'events' ? 'bg-red-50 text-red-700 shadow-sm' : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'}`}>Evenimente</button>
+              <button onClick={() => setActiveTab('users')} className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-200 whitespace-nowrap ${activeTab === 'users' ? 'bg-red-50 text-red-700 shadow-sm' : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'}`}>Utilizatori</button>
+              <button onClick={() => setActiveTab('structure')} className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-200 whitespace-nowrap ${activeTab === 'structure' ? 'bg-red-50 text-red-700 shadow-sm' : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'}`}>Structură</button>
+          </div>
       </div>
 
       {/* --- CONTENT: EVENTS --- */}
@@ -279,7 +282,7 @@ export const AdminDashboard: React.FC = () => {
                     <h2 className="text-2xl font-bold text-gray-900">Validare Evenimente</h2>
                     <p className="text-gray-500 text-sm mt-1">Aprobă sau respinge evenimentele propuse de organizatori.</p>
                 </div>
-                <div className="bg-gray-100 px-4 py-2 rounded-full text-sm font-bold text-gray-700">
+                <div className="bg-gray-100 px-4 py-2 rounded-full text-sm font-bold text-gray-700 whitespace-nowrap ml-4">
                     {pendingEvents.length} în așteptare
                 </div>
             </div>
@@ -306,7 +309,7 @@ export const AdminDashboard: React.FC = () => {
                             <div className="p-6 flex-1 min-w-0 flex flex-col justify-center">
                                 <h3 className="text-xl font-bold text-gray-900 mb-2">{event.title}</h3>
                                 <div className="flex flex-wrap gap-4 text-sm text-gray-500 mb-3">
-                                    <span className="flex items-center bg-gray-50 px-2 py-1 rounded text-gray-600"><span className="mr-1.5">📅</span> {new Date(event.startDate).toLocaleDateString('en-GB')}</span>
+                                    <span className="flex items-center bg-gray-50 px-2 py-1 rounded text-gray-600"><span className="mr-1.5">📅</span> {new Date(event.startDate).toLocaleDateString('ro-RO')}</span>
                                     <span className="flex items-center bg-gray-50 px-2 py-1 rounded text-gray-600"><span className="mr-1.5">📍</span> {event.location}</span>
                                 </div>
                                 <p className="text-sm text-gray-600 line-clamp-2 leading-relaxed">{event.shortDescription || event.description}</p>
@@ -380,7 +383,7 @@ export const AdminDashboard: React.FC = () => {
               <div className="lg:col-span-1 bg-white rounded-2xl shadow-sm border border-gray-200 p-6 h-fit">
                   <h3 className="font-bold text-lg mb-4 text-gray-900">Schimbă Rol</h3>
                   <form onSubmit={handleUpdateRole} className="space-y-4">
-                      <Input label="User ID" value={targetUserId} onChange={e => setTargetUserId(e.target.value)} placeholder="UUID..." />
+                      <Input label="ID Utilizator" value={targetUserId} onChange={e => setTargetUserId(e.target.value)} placeholder="UUID..." />
                       <div className="flex flex-col gap-2">
                           <label className="flex items-center space-x-2"><input type="radio" name="role" checked={selectedRole === UserRole.STUDENT} onChange={() => setSelectedRole(UserRole.STUDENT)} /> <span className="text-gray-900">Student</span></label>
                           <label className="flex items-center space-x-2"><input type="radio" name="role" checked={selectedRole === UserRole.ORGANIZER} onChange={() => setSelectedRole(UserRole.ORGANIZER)} /> <span className="text-gray-900">Organizator</span></label>
@@ -456,7 +459,7 @@ export const AdminDashboard: React.FC = () => {
                                   <p className="text-sm text-gray-600 mt-2">{faculty.description}</p>
                               </div>
                               <div className="flex gap-2">
-                                  <button onClick={() => startEditFaculty(faculty)} className="text-indigo-600 hover:bg-indigo-50 p-2 rounded">Edit</button>
+                                  <button onClick={() => startEditFaculty(faculty)} className="text-indigo-600 hover:bg-indigo-50 p-2 rounded">Editează</button>
                                   <button onClick={() => handleDeleteFaculty(faculty.id)} className="text-red-600 hover:bg-red-50 p-2 rounded">Șterge</button>
                               </div>
                           </div>
