@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { eventService } from '../../services/eventService';
 import { Event, EventStatus } from '../../types';
 import { EventDetailsModal } from '../ui/EventDetailsModal';
+import { formatDate } from '../../utils/dateUtils';
 
 type Tab = 'all' | 'registered' | 'favorites';
 
@@ -140,7 +141,6 @@ export const StudentDashboard: React.FC = () => {
       }
 
       // Check for specific edge case where backend says "already cancelled"
-      // If so, we treat it as a success for the purpose of UI consistency (the user is not registered).
       const isAlreadyCancelledError = isCancellation && res.message && (
           res.message.toLowerCase().includes('already cancelled') || 
           res.message.toLowerCase().includes('not registered')
@@ -184,10 +184,8 @@ export const StudentDashboard: React.FC = () => {
           }
 
       } else {
-          // Show error clearly
           const msg = res.message || "Acțiune eșuată. Reîncearcă.";
           setErrorMsg(msg);
-          // Auto-hide error after 5s
           setTimeout(() => setErrorMsg(null), 5000);
       }
       
@@ -214,21 +212,6 @@ export const StudentDashboard: React.FC = () => {
       const freshEvent = events.find(e => e.id === event.id) || event;
       setSelectedEvent(freshEvent);
       setIsModalOpen(true);
-  };
-
-  const formatDate = (dateString: string) => {
-    if(!dateString) return '';
-    try {
-        return new Date(dateString).toLocaleDateString('ro-RO', { 
-            day: '2-digit', 
-            month: '2-digit', 
-            year: 'numeric', 
-            hour: '2-digit', 
-            minute: '2-digit'
-        });
-    } catch(e) {
-        return 'Invalid Date';
-    }
   };
 
   const renderModalAction = () => {
@@ -276,7 +259,6 @@ export const StudentDashboard: React.FC = () => {
            </div>
        )}
 
-       {/* Responsive Tabs Container */}
        <div className="w-full overflow-x-auto pb-2">
            <div className="flex space-x-1 bg-white p-1 rounded-xl shadow-sm border border-gray-100 min-w-max">
               <button 
@@ -377,7 +359,6 @@ export const StudentDashboard: React.FC = () => {
                                {event.shortDescription || event.description}
                            </p>
 
-                           {/* Capacity Indicator in Card */}
                            <div className="mb-4 text-xs">
                                <div className="flex justify-between mb-1 text-gray-500">
                                     <span>Locuri disponibile</span>

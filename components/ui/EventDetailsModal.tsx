@@ -6,6 +6,7 @@ import { Button } from './Button';
 import { feedbackService } from '../../services/feedbackService';
 import { fileService } from '../../services/fileService';
 import { useAuth } from '../../context/AuthContext';
+import { formatDate } from '../../utils/dateUtils';
 
 interface EventDetailsModalProps {
   isOpen: boolean;
@@ -94,17 +95,6 @@ export const EventDetailsModal: React.FC<EventDetailsModalProps> = ({ isOpen, on
       } else {
           alert("Eroare la descărcare.");
       }
-  };
-
-  const formatDate = (dateString: string) => {
-    if (!dateString) return 'Data nespecificată';
-    return new Date(dateString).toLocaleDateString('ro-RO', {
-      day: '2-digit', 
-      month: '2-digit', 
-      year: 'numeric', 
-      hour: '2-digit', 
-      minute: '2-digit'
-    });
   };
 
   if (!isOpen || !event) return null;
@@ -295,7 +285,7 @@ export const EventDetailsModal: React.FC<EventDetailsModalProps> = ({ isOpen, on
                                      <StarRatingDisplay rating={rev.rating} />
                                  </div>
                                  <p className="text-sm text-gray-600 leading-snug">{rev.comment}</p>
-                                 <div className="text-[10px] text-gray-400 mt-1">{new Date(rev.createdAt).toLocaleDateString('ro-RO')}</div>
+                                 <div className="text-[10px] text-gray-400 mt-1">{formatDate(rev.createdAt)}</div>
                              </div>
                          ))
                         }
